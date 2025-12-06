@@ -1,0 +1,30 @@
+[Unit]
+Description=Deplobox GitHub Webhook Receiver (Go)
+Documentation=https://github.com/user/deplobox
+After=network.target
+
+[Service]
+Type=simple
+User=deploybot
+Group=deploybot
+WorkingDirectory=/home/deploybot
+
+# Start the deplobox binary
+ExecStart=/home/deploybot/deplobox -config /home/deploybot/projects.yaml
+
+# Restart configuration
+Restart=always
+RestartSec=5
+
+# Environment variables
+Environment="DEPLOBOX_LOG_FILE=/home/deploybot/deployments.log"
+Environment="DEPLOBOX_DB_PATH=/home/deploybot/deployments.db"
+Environment="DEPLOBOX_SKIP_VALIDATION=0"
+Environment="DEPLOBOX_EXPOSE_OUTPUT=0"
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

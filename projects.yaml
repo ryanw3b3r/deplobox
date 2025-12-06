@@ -1,0 +1,22 @@
+projects:
+  komment:
+    path: /var/www/projects/example1
+    secret: replace-with-secret-must-be-at-least-32-chars-long
+    branch: main
+    pull_timeout: 60
+    post_deploy_timeout: 300
+    post_deploy:
+
+  sprooly-api:
+    path: /var/www/projects/example2
+    secret: another-secret-must-be-at-least-32-chars-long
+    branch: main
+    pull_timeout: 120
+    post_deploy_timeout: 600
+    post_deploy:
+      - composer install --no-dev --no-interaction --optimize-autoloader
+      - php artisan migrate --force
+      - php artisan config:cache
+      - php artisan route:cache
+      - php artisan view:cache
+      - php artisan queue:restart || true
