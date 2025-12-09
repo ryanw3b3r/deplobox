@@ -1,0 +1,25 @@
+[Unit]
+Description=Deplobox GitHub Webhook Receiver (Go)
+Documentation=https://github.com/ryanw3b3r/deplobox
+After=network.target
+
+[Service]
+Type=simple
+User={{USER}}
+Group={{GROUP}}
+WorkingDirectory={{WORKING_DIR}}
+
+ExecStart={{DEPLOBOX_HOME}}/deplobox serve --config /etc/deplobox/projects.yaml
+
+Restart=always
+RestartSec=5
+
+Environment="DEPLOBOX_LOG_FILE={{LOG_FILE}}"
+Environment="DEPLOBOX_DB_PATH={{DB_PATH}}"
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

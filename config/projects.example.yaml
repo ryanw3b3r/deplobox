@@ -1,0 +1,42 @@
+# Deplobox Projects Configuration
+# Each project uses zero-downtime deployment with the following structure:
+#   path/                  <- This is what you specify in 'path' below
+#   ├── shared/           <- Persistent files (e.g., .env, storage, uploads)
+#   ├── releases/         <- All releases with timestamps
+#   │   ├── 2025-12-07-13-08-03/
+#   │   ├── 2025-12-07-14-15-16/
+#   │   └── ...
+#   └── current -> releases/2025-12-07-14-15-16/  <- Symlink to latest release
+
+projects:
+  # Example 1: Simple project
+  komment:
+    path: /var/www/projects/komment  # Project root (contains shared/, releases/, current)
+    secret: replace-with-secret-must-be-at-least-32-chars-long
+    branch: main
+    pull_timeout: 60
+    post_deploy_timeout: 300
+    post_deploy: []
+    post_activate_timeout: 300
+    post_activate: []
+
+  # Example 2: Laravel project with shared files
+  sprooly-api:
+    path: /var/www/projects/sprooly-api  # Project root
+    secret: another-secret-must-be-at-least-32-chars-long
+    branch: main
+    pull_timeout: 120
+    post_deploy_timeout: 600
+    post_deploy:
+      - composer install --no-dev --no-interaction --optimize-autoloader
+      - php artisan migrate --force
+      - php artisan config:cache
+      - php artisan route:cache
+      - php artisan view:cache
+      - php artisan queue:restart || true
+    post_activate_timeout: 300
+    post_activate:
+      - pm2 reload ecosystem.config.js --update-env
+    # Note: Place persistent files in shared/
+    # Example: Create /var/www/projects/sprooly-api/shared/.env
+    #          Create /var/www/projects/sprooly-api/shared/storage/

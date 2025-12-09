@@ -1,0 +1,9 @@
+.gfresh
+.DS_Store
+/dist/
+*.db
+*.log
+coverage.out
+coverage.html
+*.md
+!README.md

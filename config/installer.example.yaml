@@ -1,0 +1,49 @@
+# Deplobox Installer Configuration Example
+# Copy this file to config/installer.yaml and fill in your values
+# All fields are optional - installer will prompt for missing required values
+
+# ==========================================
+# Reusable Settings (same across projects)
+# ==========================================
+
+# Domain where deplobox service receives webhooks (reusable across all projects)
+# This is where the deplobox binary is hosted
+webhook_url: "https://server.example.com"
+
+# Email for Let's Encrypt SSL certificates
+# Leave empty to skip SSL setup
+certbot_email: "tech@example.com"
+
+# Unix user that will run deployments
+deploy_user: "deploybot"
+
+# Group for web server permissions
+deploy_group: "www-data"
+
+# Root directory for all project checkouts
+projects_root: "/var/www/projects"
+
+# Directory for deplobox binary and config
+deplobox_home: "/home/deploybot/deplobox"
+
+# GitHub Personal Access Token (for automated setup)
+# Required scopes: repo, admin:public_key, write:repo_hook
+# Can also be provided via GH_TOKEN or GITHUB_TOKEN environment variable
+# Leave empty to skip GitHub automation
+github_token: "ghp_xxxxxxxxxxxxxxxxxxxx"
+
+# ==========================================
+# Project-Specific Settings
+# ==========================================
+
+# GitHub repository in owner/repo format
+# Example: username/my-app
+owner_repo: "username/my-app"
+
+# Project slug for webhook path (/in/<project>)
+# If not set, will be derived from repository name
+project_name: "my-app"
+
+# Domain where THIS project is hosted (can be different from webhook_url)
+# Example: app.example.com or myapp.mydomain.com
+project_domain: "myapp.example.com"
