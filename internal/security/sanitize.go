@@ -12,7 +12,7 @@ var (
 	// Safe patterns for validation
 	gitURLPattern  = regexp.MustCompile(`^https://github\.com/[a-zA-Z0-9_-]+/[a-zA-Z0-9_.-]+(?:\.git)?$`)
 	branchPattern  = regexp.MustCompile(`^[a-zA-Z0-9/_.-]+$`)
-	projectPattern = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
+	projectPattern = regexp.MustCompile(`^[a-zA-Z0-9_.-]+$`)
 )
 
 // ValidateGitURL ensures URL is safe for git clone operations.
@@ -61,7 +61,7 @@ func ValidateProjectName(name string) error {
 		return fmt.Errorf("project name cannot start with '-' or '.'")
 	}
 	if !projectPattern.MatchString(name) {
-		return fmt.Errorf("project name contains invalid characters (only a-z, A-Z, 0-9, _, - allowed)")
+		return fmt.Errorf("project name contains invalid characters (only a-z, A-Z, 0-9, _, -, . allowed)")
 	}
 	return nil
 }
