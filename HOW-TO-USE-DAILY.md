@@ -2,21 +2,57 @@
 
 This guide covers the everyday workflow of connecting new GitHub organizations and repositories to your deplobox server.
 
+## Table of Contents
+
+- [1. Prerequisites](#1-prerequisites)
+- [2. Quick Story: Connecting `my-github-org/my-repo` to `my-server.com`](#2-quick-story-connecting-my-github-orgmy-repo-to-my-servercom)
+  - [2.1. SSH into Your Server](#21-ssh-into-your-server)
+  - [2.2. Create a GitHub Personal Access Token](#22-create-a-github-personal-access-token)
+  - [2.3. Prepare the Installer Configuration](#23-prepare-the-installer-configuration)
+  - [2.4. Run the Installer](#24-run-the-installer)
+  - [2.5. What the Installer Does Automatically](#25-what-the-installer-does-automatically)
+  - [2.6. Verify the Installation](#26-verify-the-installation)
+  - [2.7. Test the Deployment](#27-test-the-deployment)
+- [3. Manual Setup (Without GitHub Token)](#3-manual-setup-without-github-token)
+  - [3.1. Run Installer Without Token](#31-run-installer-without-token)
+  - [3.2. Manually Add Deploy Key to GitHub](#32-manually-add-deploy-key-to-github)
+  - [3.3. Manually Create Webhook in GitHub](#33-manually-create-webhook-in-github)
+- [4. Adding a Second Project](#4-adding-a-second-project)
+  - [4.1. Option 1: Using the Same Installer Config](#41-option-1-using-the-same-installer-config)
+  - [4.2. Option 2: Create a New Config File](#42-option-2-create-a-new-config-file)
+- [5. Editing Project Configuration](#5-editing-project-configuration)
+- [6. Common Post-Deploy Commands by Framework](#6-common-post-deploy-commands-by-framework)
+  - [6.1. Node.js](#61-nodejs)
+  - [6.2. PHP / Laravel](#62-php--laravel)
+  - [6.3. Python / Django](#63-python--django)
+  - [6.4. Static Site](#64-static-site)
+- [7. Shared Files Pattern](#7-shared-files-pattern)
+- [8. Troubleshooting](#8-troubleshooting)
+  - [8.1. Webhook Not Triggering](#81-webhook-not-triggering)
+  - [8.2. Permission Denied on Git Clone](#82-permission-denied-on-git-clone)
+  - [8.3. SSL Certificate Issues](#83-ssl-certificate-issues)
+  - [8.4. View Deployment History](#84-view-deployment-history)
+- [9. Useful Commands](#9-useful-commands)
+
+---
+
+## 1. Prerequisites
+
 ## Prerequisites
 
 - Deplobox is already installed on your server (`my-server.com`)
 - You have root access to the server
 - You have admin access to the GitHub organization (`my-github-org`)
 
-## Quick Story: Connecting `my-github-org/my-repo` to `my-server.com`
+## 2. Quick Story: Connecting `my-github-org/my-repo` to `my-server.com`
 
-### Step 1: SSH into Your Server
+### 2.1. SSH into Your Server
 
 ```bash
 ssh root@my-server.com
 ```
 
-### Step 2: Create a GitHub Personal Access Token (if using automated setup)
+### 2.2. Create a GitHub Personal Access Token (if using automated setup)
 
 If you want deplobox to automatically set up the deploy key and webhook, you need a GitHub Personal Access Token (PAT).
 
@@ -35,7 +71,7 @@ These keys are used per organisation, so your personal account needs a token and
    - `Webhooks` - select **read and write**
 9. Generate the token and copy it (you won't see it again so make sure you have it!)
 
-### Step 3: Prepare the Installer Configuration
+### 2.3. Prepare the Installer Configuration
 
 You can use command-line flags or a config file. For repeated use, create a config file:
 
@@ -70,7 +106,7 @@ project_domain: 'my-repo.my-server.com' # Domain where this app will be hosted
 export GH_TOKEN="ghp_your-token-here"
 ```
 
-### Step 4: Run the Installer
+### 2.4. Run the Installer
 
 ```bash
 cd /home/deploybot/deplobox
@@ -85,7 +121,7 @@ sudo ./deplobox install
 
 The installer will prompt you for any missing values.
 
-### What the Installer Does Automatically
+### 2.5. What the Installer Does Automatically
 
 If you provided a GitHub token, the installer will:
 
@@ -100,7 +136,7 @@ If you provided a GitHub token, the installer will:
 9. **Create GitHub webhook** - Adds a webhook pointing to `https://my-server.com/in/my-repo`
 10. **Set up SSL** - Obtains a Let's Encrypt certificate for your domain
 
-### Step 5: Verify the Installation
+### 2.6. Verify the Installation
 
 ```bash
 # Check deplobox service status
@@ -116,7 +152,7 @@ curl https://my-server.com/status/my-repo
 journalctl -u deplobox -f
 ```
 
-### Step 6: Test the Deployment
+### 2.7. Test the Deployment
 
 Push a commit to the `main` branch of `my-github-org/my-repo`:
 
@@ -136,11 +172,11 @@ ssh root@my-server.com
 journalctl -u deplobox -f
 ```
 
-## Manual Setup (Without GitHub Token)
+## 3. Manual Setup (Without GitHub Token)
 
 If you don't want to provide a GitHub token, you'll need to do some steps manually:
 
-### Step 1: Run Installer Without Token
+### 3.1. Run Installer Without Token
 
 ```bash
 cd /home/deploybot/deplobox
@@ -149,7 +185,7 @@ sudo ./deplobox install
 
 Fill in the values when prompted. Leave `github_token` empty.
 
-### Step 2: Manually Add Deploy Key to GitHub
+### 3.2. Manually Add Deploy Key to GitHub
 
 After the installer completes, it will have generated an SSH key. View the public key:
 
@@ -164,7 +200,7 @@ cat /home/deploybot/.ssh/my-repo.key.pub
 5. Check "Allow write access" (if you need deployment scripts to push back)
 6. Click "Add deploy key"
 
-### Step 3: Manually Create Webhook in GitHub
+### 3.3. Manually Create Webhook in GitHub
 
 1. Go to https://github.com/my-github-org/my-repo/settings/hooks
 2. Click "Add webhook"
@@ -175,11 +211,11 @@ cat /home/deploybot/.ssh/my-repo.key.pub
    - **Events**: Select "Just the push event"
 4. Click "Add webhook"
 
-## Adding a Second Project
+## 4. Adding a Second Project
 
 To add another repository from the same or different organization:
 
-### Option 1: Using the Same Installer Config
+### 4.1. Option 1: Using the Same Installer Config
 
 ```bash
 cd /home/deploybot/deplobox
@@ -191,7 +227,7 @@ sudo ./deplobox install \
 
 The installer will reuse the existing settings from `/etc/deplobox/installer.yaml` (if it exists) and add the new project to `/etc/deplobox/projects.yaml`.
 
-### Option 2: Create a New Config File
+### 4.2. Option 2: Create a New Config File
 
 ```bash
 nano /home/deploybot/deplobox/config/another-repo.yaml
@@ -213,7 +249,7 @@ Then run:
 sudo ./deplobox install --config config/another-repo.yaml
 ```
 
-## Editing Project Configuration
+## 5. Editing Project Configuration
 
 After installation, you can edit the project configuration at any time:
 
@@ -245,9 +281,9 @@ After editing, restart the service:
 systemctl restart deplobox
 ```
 
-## Common Post-Deploy Commands by Framework
+## 6. Common Post-Deploy Commands by Framework
 
-### Node.js
+### 6.1. Node.js
 
 ```yaml
 post_deploy:
@@ -257,7 +293,7 @@ post_activate:
   - pm2 reload my-app
 ```
 
-### PHP / Laravel
+### 6.2. PHP / Laravel
 
 ```yaml
 post_deploy:
@@ -269,7 +305,7 @@ post_activate:
   - php artisan queue:restart
 ```
 
-### Python / Django
+### 6.3. Python / Django
 
 ```yaml
 post_deploy:
@@ -280,7 +316,7 @@ post_activate:
   - systemctl reload gunicorn
 ```
 
-### Static Site
+### 6.4. Static Site
 
 ```yaml
 post_deploy:
@@ -289,7 +325,7 @@ post_deploy:
 post_activate: []
 ```
 
-## Shared Files Pattern
+## 7. Shared Files Pattern
 
 Persistent files (like `.env`, uploads, etc.) should be stored in the `shared/` directory:
 
@@ -304,28 +340,28 @@ post_deploy:
   - ln -nfs /var/www/projects/my-repo/shared/uploads public/uploads
 ```
 
-## Troubleshooting
+## 8. Troubleshooting
 
-### Webhook Not Triggering
+### 8.1. Webhook Not Triggering
 
 1. Check the webhook URL in GitHub settings matches your server URL
 2. Verify the secret in GitHub webhook matches `/etc/deplobox/projects.yaml`
 3. Check deplobox service is running: `systemctl status deplobox`
 
-### Permission Denied on Git Clone
+### 8.2. Permission Denied on Git Clone
 
 1. Verify the deploy key was added to GitHub
 2. Check SSH key permissions: `ls -la /home/deploybot/.ssh/`
 3. Test SSH connection: `sudo -u deploybot ssh -T git@github.com`
 
-### SSL Certificate Issues
+### 8.3. SSL Certificate Issues
 
 ```bash
 # Manually obtain SSL certificate
 sudo certbot --nginx -d my-repo.my-server.com
 ```
 
-### View Deployment History
+### 8.4. View Deployment History
 
 ```bash
 # Via API
@@ -335,7 +371,7 @@ curl https://my-server.com/status/my-repo
 sqlite3 /home/deploybot/deplobox/deployments.db "SELECT * FROM deployments ORDER BY created_at DESC LIMIT 10;"
 ```
 
-## Useful Commands
+## 9. Useful Commands
 
 ```bash
 # Service management
