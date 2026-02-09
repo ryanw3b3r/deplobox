@@ -2,6 +2,8 @@
 
 A secure, lightweight GitHub webhook receiver for automated deployments. Written in Go with zero dependencies and comprehensive security hardening.
 
+To read how to use on your server go to [HOW TO USE DAILY](HOW-TO-USE-DAILY.md) file.
+
 ## Features
 
 ### Deployment
@@ -265,11 +267,11 @@ projects:
     post_deploy_timeout: 300 # Default: 300 seconds
     post_deploy: # Default: []
       - command arg1 arg2 # String format (shell-quoted)
-      - ["command", "arg1", "arg2"] # List format (preferred)
+      - ['command', 'arg1', 'arg2'] # List format (preferred)
     post_activate_timeout: 300 # Default: 300 seconds
     post_activate: # Default: []
       - command arg1 arg2 # Runs AFTER current symlink is updated
-      - ["pm2", "reload", "app"] # Example: restart app server
+      - ['pm2', 'reload', 'app'] # Example: restart app server
 ```
 
 ### Validation Rules
